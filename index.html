@@ -221,7 +221,7 @@
         fileInpneto.toLocaleString()}`;
         }
 
-                 // --- CARGADOR DE IA REFORZADO (MODO CPU SEGURO) ---
+                // --- MOTOR IA DRIVER-PRO (SOLUCIÓN DEFINITIVA IPHONE) ---
         const fileInput = document.getElementById('iaFile');
         
         fileInput.onchange = async (e) => {
@@ -231,13 +231,18 @@
             alert("Archivo detectado: " + file.name);
 
             try {
+                // Forzamos la limpieza de funciones incompatibles de Safari
+                if (navigator.gpu) {
+                    delete GPUAdapter.prototype.requestAdapterInfo;
+                }
+
                 const { FilesetResolver, LlmInference } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.14");
                 const genaiFileset = await FilesetResolver.forGenAiTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.14/wasm");
                 const modelAssetBuffer = await file.arrayBuffer();
 
-                alert("Iniciando motor en modo seguro... espera unos segundos.");
+                alert("Iniciando motor... espera unos 20 segundos.");
 
-                // Forzamos el uso de CPU para saltar el error de AdapterInfo en iPhone
+                // Forzamos modo CPU para evitar el error técnico de AdapterInfo
                 const llmInference = await LlmInference.createFromOptions(genaiFileset, {
                     baseOptions: { 
                         modelAssetBuffer: new Uint8Array(modelAssetBuffer),
@@ -245,17 +250,17 @@
                     }
                 });
 
-                // ACTIVACIÓN VISUAL DEL CHAT
+                // Cambiamos la interfaz al chat azul profesional
                 document.getElementById('iaSetup').style.display = 'none';
                 document.getElementById('iaChat').style.display = 'block';
                 document.getElementById('iaChat').innerHTML = `
-                    <div style="display:flex; flex-direction:column; height:350px; background:#0F172A; border-radius:20px; padding:12px; border:1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <div id="chatBox" style="flex:1; overflow-y:auto; margin-bottom:10px; font-size:0.85rem; color:#E2E8F0; padding:5px;">
-                            <p style="color:var(--blue); border-bottom:1px solid #1E293B; padding-bottom:8px;"><b>DRIVER-PRO AI:</b> ¡Hola William! Ya estoy lista en tu iPhone. ¿Qué analizamos hoy?</p>
+                    <div style="display:flex; flex-direction:column; height:360px; background:#0F172A; border-radius:20px; padding:15px; border:1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                        <div id="chatBox" style="flex:1; overflow-y:auto; margin-bottom:12px; font-size:0.9rem; color:#F1F5F9;">
+                            <p style="color:var(--blue); border-bottom:1px solid #1E293B; padding-bottom:10px; margin-bottom:10px;"><b>DRIVER-PRO AI:</b> ¡Conectada! ¿Qué quieres analizar hoy?</p>
                         </div>
-                        <div style="display:flex; gap:8px;">
-                            <input type="text" id="iaInput" placeholder="Escribe aquí..." style="flex:1; background:#1E293B !important; color:white !important; border:1px solid var(--border) !important; border-radius:12px !important; padding:10px !important;">
-                            <button onclick="preguntarIA()" style="background:var(--blue); border:none; width:45px; height:42px; border-radius:12px; color:black; display:flex; align-items:center; justify-content:center;">
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="iaInput" placeholder="Escribe aquí..." style="flex:1; background:#1E293B !important; color:white !important; border-radius:12px !important; border:1px solid var(--border) !important; padding:12px !important;">
+                            <button onclick="preguntarIA()" style="background:var(--blue); border:none; width:50px; height:45px; border-radius:12px; color:black; display:flex; align-items:center; justify-content:center;">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
@@ -267,42 +272,41 @@
                     const box = document.getElementById('chatBox');
                     if(!input.value || input.value.includes('...')) return;
                     
-                    const msg = input.value;
-                    box.innerHTML += `<div style="text-align:right; margin-top:10px;"><span style="background:#1E293B; padding:8px 12px; border-radius:15px; display:inline-block;">${msg}</span></div>`;
+                    const userMsg = input.value;
+                    box.innerHTML += `<div style="text-align:right; margin-top:10px;"><span style="background:#1E293B; padding:8px 15px; border-radius:15px; display:inline-block;">${userMsg}</span></div>`;
                     input.value = 'Procesando...';
                     
                     try {
-                        const response = await llmInference.generateResponse(msg);
-                        box.innerHTML += `<div style="color:var(--blue); margin-top:10px; line-height:1.4;"><b>IA:</b> ${response}</div>`;
+                        const response = await llmInference.generateResponse(userMsg);
+                        box.innerHTML += `<div style="color:var(--blue); margin-top:12px; line-height:1.5;"><b>IA:</b> ${response}</div>`;
                     } catch (e) {
-                        box.innerHTML += `<p style="color:#F87171; font-size:0.75rem;">Error: El motor se reinició.</p>`;
+                        box.innerHTML += `<p style="color:#F87171; font-size:0.8rem; margin-top:5px;">Error: El motor se sobrecargó.</p>`;
                     }
                     input.value = '';
                     box.scrollTop = box.scrollHeight;
                 };
 
-                alert("¡IA ACTIVADA CON ÉXITO!");
+                alert("¡IA LISTA PARA USAR!");
 
             } catch (err) {
-                alert("Error de carga: " + err);
+                alert("Error de compatibilidad: " + err);
             }
         };
 
         window.onload = () => { 
             renderizar();
             setTimeout(() => { 
-                const s = document.getElementById('splash');
-                if(s) {
-                    s.style.opacity = '0';
-                    setTimeout(() => s.style.display = 'none', 600);
+                const splash = document.getElementById('splash');
+                if(splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.display = 'none', 600);
                 }
-            }, 1500);
+            }, 1000);
         };
     </script>
 </body>
 </html>
-       
-        
 
+        
         
                 

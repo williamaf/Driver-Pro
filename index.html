@@ -183,8 +183,10 @@
         <div id="iaChat" style="flex: 1; overflow-y: auto; padding: 15px;"></div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.14"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.14" crossorigin="anonymous"></script>
+    
     <script>
+        // Lógica de Registros
         let registros = JSON.parse(localStorage.getItem('driver_pro_final_v2')) || [];
         const hoy = new Date().toISOString().split('T')[0];
         document.getElementById('fechaDesde').value = hoy;
@@ -192,7 +194,7 @@
 
         const sheet = document.getElementById('bottomSheet');
         const header = document.getElementById('sheetHeader');
-        header.addEventListener('click', (e) => { if(e.target.tagName !== 'SPAN') sheet.classList.toggle('open'); });
+        header.onclick = () => sheet.classList.toggle('open');
 
         function guardar() {
             const m = document.getElementById('monto').value;
@@ -204,9 +206,7 @@
             sincronizar();
         }
 
-        function borrarItem(id) { if(confirm('¿Eliminar?')) { registros = registros.filter(r => r.id !== id); sincronizar(); } }
         function sincronizar() { localStorage.setItem('driver_pro_final_v2', JSON.stringify(registros)); renderizar(); }
-
         function renderizar() {
             const d = document.getElementById('fechaDesde').value, h = document.getElementById('fechaHasta').value;
             const lista = document.getElementById('listaContenedor');
@@ -214,51 +214,43 @@
             registros.filter(r => r.fecha >= d && r.fecha <= h).forEach(r => {
                 const esI = r.tipo === 'ingreso';
                 neto += esI ? r.monto : -r.monto;
-                lista.innerHTML += `<div class="item">
-                    <div><p style="font-weight:700;">${r.categoria}</p><small style="color:#94A3B8;">${r.fecha}</small></div>
-                    <div style="display:flex; align-items:center;">
-                        <b style="color:${esI?'var(--blue)':'#F87171'}">${esI?'+':'-'}$${r.monto.toLocaleString()}</b>
-                        <i class="fas fa-times-circle" style="color:#F87171; margin-left:12px;" onclick="borrarItem(${r.id})"></i>
-                    </div>
-                </div>`;
+                lista.innerHTML += `<div class="item"><div><p><b>${r.categoria}</b></p><small>${r.fecha}</small></div><b style="color:${esI?'#38BDF8':'#F87171'}">${esI?'+':'-'}$${r.monto.toLocaleString()}</b></div>`;
             });
             document.getElementById('totalBalance').innerText = `$ ${neto.toLocaleString()}`;
         }
 
-        function crearBackup() {
-            const t = "PROBKP:" + btoa(JSON.stringify(registros));
-            navigator.clipboard.writeText(t); alert('Backup copiado.');
-        }
-
-        function importarBackup() {
-            const t = prompt('Pega el código BKP:');
-            if(t && t.startsWith('PROBKP:')) { registros = JSON.parse(atob(t.split(':')[1])); sincronizar(); }
-        }
-
-        function compartirWhatsApp() {
-            const d = document.getElementById('fechaDesde').value;
-            const msg = `*REPORT DRIVER-PRO*\nBalance: ${document.getElementById('totalBalance').innerText}`;
-            window.location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
-        }
-
-        function resetear() { if(confirm('¿Borrar todo?')) { registros = []; sincronizar(); } }
-
-        // LÓGICA DE CARGA DE MOTOR IA LOCAL
-        document.getElementById('iaFile').addEventListener('change', async (e) => {
+        // --- CARGADOR DE IA PARA IPHONE ---
+        const fileInput = document.getElementById('iaFile');
+        
+        fileInput.onchange = async (e) => {
             const file = e.target.files[0];
-            if (file) {
-                alert("Procesando motor: " + file.name);
-                try {
-                    const modelBuffer = await file.arrayBuffer();
-                    const genai = await createFilesetResolver({ genai: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai/wasm" });
-                    // Aquí se inicializa el motor con el archivo seleccionado
-                    alert("¡Motor cargado con éxito!");
-                    document.getElementById('iaSetup').innerHTML = '<p style="color:var(--blue)">✓ IA Activa</p>';
-                } catch (err) { alert("Error: " + err); }
-            }
-        });
+            if (!file) return;
 
-        window.onload = () => { renderizar(); setTimeout(() => { document.getElementById('splash').style.opacity = '0'; setTimeout(() => document.getElementById('splash').style.display = 'none', 600); }, 1500); };
+            alert("Archivo detectado: " + file.name); // Si sale esto, el iPhone ya despertó
+
+            try {
+                const { FilesetResolver, LlmInference } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.14");
+                
+                const genaiFileset = await FilesetResolver.forGenAiTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai/wasm");
+                const modelAssetBuffer = await file.arrayBuffer();
+
+                alert("Iniciando motor... espera un momento.");
+
+                const llmInference = await LlmInference.createFromOptions(genaiFileset, {
+                    baseOptions: { modelAssetBuffer: new Uint8Array(modelAssetBuffer) }
+                });
+
+                document.getElementById('iaSetup').innerHTML = '<p style="color:#38BDF8; text-align:center;">✓ IA ACTIVADA</p>';
+                alert("¡IA Lista en Driver-Pro!");
+            } catch (err) {
+                alert("Error técnico: " + err);
+            }
+        };
+
+        window.onload = () => { 
+            renderizar();
+            setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 1000);
+        };
     </script>
 </body>
 </html>

@@ -219,40 +219,87 @@
             document.getElementById('totalBalance').innerText = `$ ${neto.toLocaleString()}`;
         }
 
-        // --- CARGADOR DE IA PARA IPHONE ---
+                // --- CARGADOR DE IA REFORZADO (PLAN B INCLUIDO) ---
         const fileInput = document.getElementById('iaFile');
         
         fileInput.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            alert("Archivo detectado: " + file.name); // Si sale esto, el iPhone ya despertó
+            alert("Archivo detectado: " + file.name);
 
             try {
                 const { FilesetResolver, LlmInference } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.14");
-                
-                const genaiFileset = await FilesetResolver.forGenAiTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai/wasm");
+                const genaiFileset = await FilesetResolver.forGenAiTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.14/wasm");
                 const modelAssetBuffer = await file.arrayBuffer();
 
-                alert("Iniciando motor... espera un momento.");
+                alert("Iniciando motor... procesando 30MB.");
 
-                const llmInference = await LlmInference.createFromOptions(genaiFileset, {
-                    baseOptions: { modelAssetBuffer: new Uint8Array(modelAssetBuffer) }
-                });
+                let llmInference;
+                try {
+                    // Intento 1: GPU (Turbo)
+                    llmInference = await LlmInference.createFromOptions(genaiFileset, {
+                        baseOptions: { modelAssetBuffer: new Uint8Array(modelAssetBuffer), delegate: "GPU" }
+                    });
+                } catch (gpuErr) {
+                    console.log("Fallo GPU, usando CPU...");
+                    // Intento 2: CPU (Seguro)
+                    llmInference = await LlmInference.createFromOptions(genaiFileset, {
+                        baseOptions: { modelAssetBuffer: new Uint8Array(modelAssetBuffer), delegate: "CPU" }
+                    });
+                }
 
-                document.getElementById('iaSetup').innerHTML = '<p style="color:#38BDF8; text-align:center;">✓ IA ACTIVADA</p>';
-                alert("¡IA Lista en Driver-Pro!");
+                // MOSTRAR EL CHAT
+                document.getElementById('iaSetup').style.display = 'none';
+                document.getElementById('iaChat').style.display = 'block';
+                document.getElementById('iaChat').innerHTML = `
+                    <div style="display:flex; flex-direction:column; height:350px; background:#0F172A; border-radius:20px; padding:12px; border:1px solid var(--border);">
+                        <div id="chatBox" style="flex:1; overflow-y:auto; margin-bottom:10px; font-size:0.85rem; color:#E2E8F0;">
+                            <p style="color:var(--blue)"><b>DRIVER-PRO AI:</b> ¡Hola! Motor cargado correctamente. ¿Qué quieres consultar?</p>
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="iaInput" placeholder="Escribe aquí..." style="flex:1; background:#1E293B !important; color:white !important; border-radius:10px !important; border:1px solid var(--border) !important; padding:10px !important;">
+                            <button onclick="preguntarIA()" style="background:var(--blue); border:none; width:45px; border-radius:10px; color:black;"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                `;
+
+                window.preguntarIA = async () => {
+                    const input = document.getElementById('iaInput');
+                    const box = document.getElementById('chatBox');
+                    if(!input.value || input.value === 'Procesando...') return;
+                    
+                    const msg = input.value;
+                    box.innerHTML += `<div style="text-align:right; margin-top:8px;"><b>Tú:</b> ${msg}</div>`;
+                    input.value = 'Procesando...';
+                    
+                    try {
+                        const response = await llmInference.generateResponse(msg);
+                        box.innerHTML += `<div style="color:var(--blue); margin-top:8px;"><b>IA:</b> ${response}</div>`;
+                    } catch (e) {
+                        box.innerHTML += `<p style="color:#F87171;">Error al procesar respuesta.</p>`;
+                    }
+                    input.value = '';
+                    box.scrollTop = box.scrollHeight;
+                };
+
+                alert("¡IA ACTIVADA!");
+
             } catch (err) {
-                alert("Error técnico: " + err);
+                alert("Error final: " + err);
             }
         };
 
         window.onload = () => { 
             renderizar();
-            setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 1000);
+            setTimeout(() => { 
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => document.getElementById('splash').style.display = 'none', 600);
+            }, 1500);
         };
     </script>
 </body>
 </html>
 
+        
                 

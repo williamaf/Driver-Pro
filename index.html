@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Driver-Pro">
+    
+    <link rel="manifest" href="manifest.json">
+    
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzA1MDcwQSIvPgogIDx0ZXh0IHg9IjQ4JSIgeT0iNTYlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iJ0ludGVyJywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIzMDBweCIgZmlsbD0iI0ZGRkZGRiI+RDwvdGV4dD4KICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjM1IiBmaWxsPSIjMzhCREY4Ii8+Cjwvc3ZnPg==">
+
+    <title>Driver-Pro Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #05070A; --card: #0F172A; --inner: #1E293B;
+            --blue: #38BDF8; --blue-deep: #007AFF; --purple: #C084FC;
+            --border: #334155; --sheet-bg: #111827;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: var(--bg) !important; color: #F8FAFC !important; 
+            font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; 
+            overflow: hidden; padding-top: env(safe-area-inset-top);
+        }
+
+        @keyframes shineMove {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .logo-animado { 
+            font-size: 1.8rem; font-weight: 900; 
+            background: linear-gradient(90deg, #1e293b 0%, var(--blue) 50%, #1e293b 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shineMove 3s linear infinite;
+            letter-spacing: -1px;
+        }
+
+        .header { flex-shrink: 0; padding: 15px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg); z-index: 10; }
+        .top-section { flex-grow: 1; padding: 10px 12px; display: flex; flex-direction: column; gap: 12px; z-index: 5; }
+        .card { background: var(--card) !important; border: 1px solid var(--border); border-radius: 24px; padding: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); }
+        .card-balance { padding: 30px 16px !important; display: flex; flex-direction: column; justify-content: center; min-height: 140px; }
+        .inner-box { background: var(--inner) !important; border-radius: 14px; padding: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
+
+        .total-val { 
+            font-size: 3.2rem; font-weight: 900; color: var(--blue); text-align: center; 
+            text-shadow: 0 0 25px rgba(56, 189, 248, 0.3); line-height: 1; margin-top: 5px;
+        }
+        
+        /* ESTA ES LA ESTRUCTURA QUE MANTIENE TUS FECHAS ALINEADAS */
+        .row { display: flex; gap: 8px; width: 100%; }
+        .col { flex: 1; }
+        label { display: block; font-size: 0.6rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px; }
+        
+        input, select { 
+            width: 100% !important; padding: 12px !important; border-radius: 12px !important; 
+            background: #0F172A !important; color: #FFF !important; border: 1px solid var(--border) !important; 
+            font-size: 1rem !important; appearance: none; -webkit-appearance: none;
+        }
+
+        .btn { border: none; border-radius: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; transition: 0.2s; }
+        .btn-save { background: var(--blue-deep) !important; color: #FFF !important; padding: 18px; width: 100%; margin-top: 5px; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
+        .btn-tool { background: #1E293B !important; color: #FFF !important; padding: 14px; border: 1px solid var(--border); flex: 1; }
+
+        .sheet {
+            position: fixed; left: 0; right: 0; bottom: 0;
+            background-color: var(--sheet-bg); border-top-left-radius: 28px; border-top-right-radius: 28px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 100;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); overflow: hidden;
+            border-top: 1px solid var(--border); height: calc(100vh - 100px);
+            transform: translateY(calc(100% - 70px));
+        }
+
+        .sheet.open { transform: translateY(0); }
+        .sheet-header { padding: 10px 16px 20px 16px; cursor: grab; display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid var(--border); }
+        .sheet-handle { width: 40px; height: 5px; background-color: var(--border); border-radius: 3px; margin-bottom: 10px; }
+        .sheet-title-row { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .sheet-content { height: calc(100% - 70px); overflow-y: auto; padding: 12px 12px env(safe-area-inset-bottom) 12px; -webkit-overflow-scrolling: touch; }
+
+        .item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: var(--card); padding: 16px; border-radius: 20px; 
+            margin-bottom: 10px; border: 1px solid var(--border);
+        }
+        
+        .cat-name { font-weight: 700; font-size: 0.95rem; }
+        .cat-entrega { color: var(--purple) !important; }
+        .val-text { font-weight: 900; font-size: 1.1rem; }
+        .del-btn { color: #F87171; font-size: 1.5rem; padding: 5px; margin-left: 12px; cursor: pointer;}
+
+        #splash { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.6s; }
+        #splash .logo-animado { font-size: 3rem; }
+
+        /* IA BOTÓN DISCRETO */
+        .btn-ia-float { position: fixed; bottom: 85px; right: 20px; width: 50px; height: 50px; border-radius: 25px; background: var(--blue-deep); color: white; border: none; z-index: 150; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+        .ia-window { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: none; flex-direction: column; padding-top: env(safe-area-inset-top); }
+        .ia-window.active { display: flex; }
+    </style>
+</head>
+<body>
+
+    <div id="splash">
+        <h1 class="logo-animado">Driver-Pro</h1>
+        <p style="color: var(--blue); font-size: 0.7rem; margin-top: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Sistema Listo</p>
+    </div>
+
+    <div class="header">
+        <div class="logo-animado">Driver-Pro</div>
+        <i class="fas fa-bolt" style="color: var(--blue);"></i>
+    </div>
+
+    <div class="top-section">
+        <div class="card card-balance">
+            <label style="text-align: center; font-size: 0.7rem; letter-spacing: 1px;">Balance Neto Periodo</label>
+            <p class="total-val" id="totalBalance">$ 0</p>
+        </div>
+
+        <div class="card card-registro">
+            <div class="inner-box">
+                <div class="row">
+                    <div class="col"><label>Desde</label><input type="date" id="fechaDesde" onchange="renderizar()"></div>
+                    <div class="col"><label>Hasta</label><input type="date" id="fechaHasta" onchange="renderizar()"></div>
+                </div>
+            </div>
+            <div class="inner-box">
+                <div class="row">
+                    <div class="col" style="flex: 1.4;"><label>Monto ($)</label><input type="number" id="monto" placeholder="0" inputmode="numeric"></div>
+                    <div class="col">
+                        <label>Categoría</label>
+                        <select id="categoria">
+                            <option value="Uber/Didi">Viaje</option>
+                            <option value="Gasolina">Gasolina</option>
+                            <option value="Peaje">Peaje</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Comida">Comida</option>
+                            <option value="Entrega">Entrega</option>
+                            <option value="William">William</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-save" onclick="guardar()"><i class="fas fa-plus-circle"></i> GUARDAR DATOS</button>
+            <div class="row" style="margin-top: 10px;">
+                <button class="btn btn-tool" onclick="compartirWhatsApp()"><i class="fab fa-whatsapp"></i> REPORT</button>
+                <button class="btn btn-tool" onclick="crearBackup()"><i class="fas fa-copy"></i> BKP</button>
+                <button class="btn btn-tool" onclick="importarBackup()"><i class="fas fa-sync"></i> REST</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet" id="bottomSheet">
+        <div class="sheet-header" id="sheetHeader">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title-row">
+                <label style="color: #FFF; font-size: 0.8rem;">Movimientos</label>
+                <span style="font-size: 0.6rem; color: #ff4d4d; font-weight:900;" onclick="resetear()">LIMPIAR TODO</span>
+            </div>
+        </div>
+        <div class="sheet-content" id="listaContenedor"></div>
+    </div>
+
+    <button class="btn-ia-float" onclick="document.getElementById('iaPanel').classList.toggle('active')">
+        <i class="fas fa-robot"></i>
+    </button>
+
+    <div id="iaPanel" class="ia-window">
+        <div style="padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 900; color: var(--blue);">IA LOCAL</span>
+            <i class="fas fa-times" onclick="document.getElementById('iaPanel').classList.remove('active')"></i>
+        </div>
+        <div id="iaSetup" style="padding: 40px; text-align: center;">
+            <input type="file" id="iaFile" style="display: none;">
+            <button onclick="document.getElementById('iaFile').click()" style="background: var(--blue); color: black; padding: 15px; border-radius: 12px; font-weight: 900; border: none;">CARGAR MOTOR IA</button>
+        </div>
+        <div id="iaChat" style="flex: 1; overflow-y: auto; padding: 15px;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.14"></script>
+    <script>
+        let registros = JSON.parse(localStorage.getItem('driver_pro_final_v2')) || [];
+        const hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('fechaDesde').value = hoy;
+        document.getElementById('fechaHasta').value = hoy;
+
+        const sheet = document.getElementById('bottomSheet');
+        const header = document.getElementById('sheetHeader');
+        let startY, isDragging = false;
+
+        header.addEventListener('click', (e) => { if(e.target.tagName !== 'SPAN') sheet.classList.toggle('open'); });
+        header.addEventListener('touchstart', (e) => { isDragging = true; startY = e.touches[0].clientY; sheet.style.transition = 'none'; });
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            let moveY = e.touches[0].clientY;
+            let diff = moveY - startY;
+            if (sheet.classList.contains('open') && diff > 60) { sheet.classList.remove('open'); isDragging = false; }
+            else if (!sheet.classList.contains('open') && diff < -60) { sheet.classList.add('open'); isDragging = false; }
+        });
+        document.addEventListener('touchend', () => { isDragging = false; sheet.style.transition = ''; });
+
+        function guardar() {
+            const m = document.getElementById('monto').value;
+            const c = document.getElementById('categoria').value;
+            const f = document.getElementById('fechaDesde').value;
+            if(!m || m <= 0) return;
+            registros.unshift({ id: Date.now(), monto: parseFloat(m), categoria: c, fecha: f, tipo: (c === 'Uber/Didi') ? 'ingreso' : (c === 'Entrega' ? 'entrega' : 'egreso') });
+            document.getElementById('monto').value = '';
+            sincronizar();
+        }
+
+        function borrarItem(id) { if(confirm('¿Eliminar este registro?')) { registros = registros.filter(r => r.id !== id); sincronizar(); } }
+        function sincronizar() { localStorage.setItem('driver_pro_final_v2', JSON.stringify(registros)); renderizar(); }
+
+        function renderizar() {
+            const d = document.getElementById('fechaDesde').value, h = document.getElementById('fechaHasta').value;
+            const lista = document.getElementById('listaContenedor');
+            let neto = 0; lista.innerHTML = '';
+            registros.filter(r => r.fecha >= d && r.fecha <= h).forEach(r => {
+                const esI = r.tipo === 'ingreso', esE = r.categoria === 'Entrega';
+                neto += esI ? r.monto : -r.monto;
+                lista.innerHTML += `
+                    <div class="item">
+                        <div><p class="cat-name ${esE ? 'cat-entrega' : ''}">${r.categoria}</p><small style="color:#64748B">${r.fecha}</small></div>
+                        <div style="display:flex; align-items:center;">
+                            <span class="val-text" style="color:${esI ? 'var(--blue)' : '#F87171'}">${esI?'+':'-'}$${r.monto.toLocaleString()}</span>
+                            <i class="fas fa-times-circle del-btn" onclick="borrarItem(${r.id})"></i>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('totalBalance').innerText = `$ ${neto.toLocaleString('es-CO')}`;
+        }
+
+        function crearBackup() {
+            const t = "PROBKP:" + btoa(JSON.stringify(registros));
+            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select();
+            document.execCommand('copy'); document.body.removeChild(el); alert('Código de seguridad copiado.');
+        }
+
+        function importarBackup() {
+            const t = prompt('Pega el código de backup aquí:');
+            if(t && t.startsWith('PROBKP:')) { try { registros = JSON.parse(atob(t.split(':')[1])); sincronizar(); alert('Datos restaurados.'); } catch(e) { alert('Código no válido.'); } }
+        }
+
+        function compartirWhatsApp() {
+            const d = document.getElementById('fechaDesde').value, h = document.getElementById('fechaHasta').value;
+            const f = registros.filter(r => r.fecha >= d && r.fecha <= h);
+            let i=0, g=0, e=0, m=0, w=0;
+            f.forEach(r => { 
+                if(r.tipo==='ingreso') i+=r.monto; else if(r.categoria==='Entrega') e+=r.monto; 
+                else if(r.categoria==='Mantenimiento') m+=r.monto; else if(r.categoria==='William') w+=r.monto; else g+=r.monto; 
+            });
+            const msg = `*DRIVER-PRO REPORT*\n📅 ${d} / ${h}\n🔵 Ingresos: $${i.toLocaleString()}\n🔧 Mant: $${m.toLocaleString()}\n👤 Retiro Will: $${w.toLocaleString()}\n🔴 Gastos: $${g.toLocaleString()}\n*NETO: $${(i-g-e-m-w).toLocaleString()}*`;
+            window.location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
+        }
+
+        function resetear() { if(confirm('¿BORRAR TODO EL HISTORIAL?')) { registros=[]; sincronizar(); } }
+
+        window.onload = () => { renderizar(); setTimeout(() => { document.getElementById('splash').style.opacity='0'; setTimeout(() => document.getElementById('splash').style.display='none', 500); }, 1500); };
+    </script>
+</body>
+</html>

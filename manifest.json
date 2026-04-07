@@ -1,0 +1,16 @@
+{
+  "short_name": "Driver-Pro",
+  "name": "Driver-Pro Premium",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#05070A",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#05070A"
+}

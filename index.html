@@ -216,13 +216,13 @@
                 neto += esI ? r.monto : -r.monto;
                 lista.innerHTML += `<div class="item"><div><p><b>${r.categoria}</b></p><small>${r.fecha}</small></div><b style="color:${esI?'#38BDF8':'#F87171'}">${esI?'+':'-'}$${r.monto.toLocaleString()}</b></div>`;
             });
-            document.getElementById('totalBalance').innerText = `$ ${neto.toLocaleString()}`;
+            document.getElementById('totalBalance').innerText = `$ ${
+        
+        fileInpneto.toLocaleString()}`;
         }
 
                 // --- CARGADOR DE IA REFORZADO (PLAN B INCLUIDO) ---
-        const fileInput = document.getElementById('iaFile');
-        
-        fileInput.onchange = async (e) => {
+        const fileInput = document.getElementById('iaFile');ut.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
